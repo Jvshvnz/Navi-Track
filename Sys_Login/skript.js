@@ -117,13 +117,7 @@
                 }, 2500);
             }
 
-            // Demo Alert
-            setTimeout(() => {
-                alert(
-                    "🎉 Login Successful!\n\n" +
-                    "Welcome to Horizon Capstone Management System."
-                );
-            }, 800);
+            
 
         }, 1800);
     }
