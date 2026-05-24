@@ -1,0 +1,453 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Campus Nav — PSU's official web room locator, scheduling system, and laboratory attendance & monitoring platform.">
+    <title>Navi Track • User</title>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600&family=Instrument+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="user.css">
+
+
+</head>
+<body class="bg-[#0A2540] text-white overflow-x-hidden">
+
+    <!-- LOADING SCREEN -->
+    <div id="loading-screen">
+        <div class="ls-glow"></div>
+        <div style="position:relative; text-align:center; display:flex; flex-direction:column; align-items:center;">
+            <div class="ls-compass-wrap">
+                <svg class="ls-ring" viewBox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <circle cx="60" cy="60" r="55" stroke="#E8B923" stroke-width="1.5"
+                            stroke-dasharray="5 4" stroke-linecap="round" opacity="0.5"/>
+                    <rect x="58.5" y="3"  width="3" height="9" rx="1.5" fill="#E8B923"/>
+                    <rect x="58.5" y="108" width="3" height="9" rx="1.5" fill="#E8B923" opacity="0.35"/>
+                    <rect x="3"   y="58.5" width="9" height="3" rx="1.5" fill="#E8B923" opacity="0.35"/>
+                    <rect x="108" y="58.5" width="9" height="3" rx="1.5" fill="#E8B923" opacity="0.35"/>
+                </svg>
+                <svg class="ls-ring-inner" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <circle cx="50" cy="50" r="46" stroke="#E8B923" stroke-width="1"
+                            stroke-dasharray="2 6" stroke-linecap="round" opacity="0.3"/>
+                </svg>
+                <div class="ls-disc">
+                    <div style="position:relative; width:100%; height:100%;">
+                        <div class="ls-needle"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="ls-brand">Navi Track</div>
+            <div class="ls-tagline">Pangasinan State University Bayambang Campus</div>
+            <div class="ls-progress-wrap">
+                <div class="ls-progress-meta">
+                    <span class="ls-status" id="ls-status">Initializing</span>
+                    <span class="ls-pct"    id="ls-pct">0%</span>
+                </div>
+                <div class="ls-track">
+                    <div class="ls-fill" id="ls-fill"></div>
+                </div>
+            </div>
+            <div class="ls-dots">
+                <span></span><span></span><span></span>
+            </div>
+        </div>
+    </div>
+
+    <!-- NAVBAR -->
+    <nav class="sticky top-0 z-50 bg-[#0A2540]/95 backdrop-blur-lg border-b border-white/10">
+        <div class="max-w-screen-2xl mx-auto px-6 md:px-8 py-5 flex items-center justify-between">
+            <div class="flex items-center gap-x-3">
+                <div class="flex items-center gap-x-3">
+                    <div class="w-10 h-10 flex items-center justify-center">
+                        <img src="Logo.png" alt="Pangasinan State University Logo" class="w-full h-full object-contain rounded-full">
+                    </div>
+                    <h1 class="display-font text-3xl tracking-[-1px]">Navi Track</h1>
+                    <span class="px-3 py-px text-xs font-medium bg-[#E8B923] text-[#0A2540] rounded-3xl -mt-1">
+                        Pangasinan State University Bayambang Campus
+                    </span>
+                </div>
+                <div class="hidden md:flex items-center gap-x-10 text-sm font-medium">
+                    <a href="#hero"     class="nav-link cursor-pointer">Home</a>
+                    <a href="#features" class="nav-link cursor-pointer">Features</a>
+                    <a href="#locator"  class="nav-link cursor-pointer">Room Locator</a>
+                    <a href="#schedule" class="nav-link cursor-pointer">Schedules</a>
+                    <a href="#about"    class="nav-link cursor-pointer">About</a>
+                </div>
+                </div>
+            </div>
+        </div>
+        <div id="mobile-menu" class="hidden md:hidden bg-[#0A2540] border-t border-white/10 px-8 py-8">
+            <div class="flex flex-col gap-y-6 text-lg font-medium">
+                <a href="#hero"     onclick="toggleMobileMenu()" class="nav-link">Home</a>
+                <a href="#features" onclick="toggleMobileMenu()" class="nav-link">Features</a>
+                <a href="#locator"  onclick="toggleMobileMenu()" class="nav-link">Room Locator</a>
+                <a href="#schedule" onclick="toggleMobileMenu()" class="nav-link">Schedules</a>
+                <a href="#about"    onclick="toggleMobileMenu()" class="nav-link">About</a>
+                <div class="pt-6 border-t border-white/10">
+                    <button onclick="toggleMobileMenu();showLoginModal()"
+                            class="w-full py-4 bg-[#E8B923] text-[#0A2540] rounded-3xl font-semibold flex justify-center items-center gap-x-2">
+                        Sign in to your PSU account
+                    </button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- HERO -->
+    <section id="hero" class="hero-bg min-h-screen flex items-center relative pt-20">
+        <div class="max-w-screen-2xl mx-auto px-8 grid md:grid-cols-12 gap-12 items-center">
+            <div class="md:col-span-7">
+                <div class="inline-flex items-center gap-x-2 bg-white/10 text-white text-sm font-medium px-6 py-2 rounded-3xl mb-8 backdrop-blur-md border border-white/20">
+                    <div class="w-2 h-2 bg-[#E8B923] rounded-full animate-pulse"></div>
+                    LIVE • Now serving 169 students &amp; faculty
+                </div>
+                <h1 class="display-font text-7xl md:text-8xl leading-[1.05] tracking-[-3px] max-w-2xl">
+                    Navigate.<br>Schedule.<br>Monitor.
+                </h1>
+                <p class="mt-6 text-2xl text-white/80 max-w-lg">
+                    PSU's all-in-one campus companion.<br>
+                    Room locator • Smart scheduling • Lab attendance &amp; monitoring
+                </p>
+                <div class="flex flex-wrap gap-4 mt-10">
+                    <button onclick="smoothScrollTo('locator')"
+                            class="px-10 py-5 bg-[#E8B923] hover:bg-white text-[#0A2540] text-xl font-semibold rounded-3xl flex items-center gap-x-3 group">
+                        Find a room now
+                    </button>
+                    <button onclick="smoothScrollTo('schedule')"
+                            class="px-8 py-5 border-2 border-white/70 hover:border-[#E8B923] text-white text-xl font-medium rounded-3xl">
+                        Open my schedule
+                    </button>
+                </div>
+                <div class="mt-16 flex items-center gap-x-12 text-sm">
+                    <div class="flex -space-x-6">
+                        <div class="w-9 h-9 bg-[#E8B923] text-[#0A2540] rounded-2xl flex items-center justify-center text-xl ring-4 ring-[#0A2540]">👩‍🎓</div>
+                        <div class="w-9 h-9 bg-[#0A2540] text-white rounded-2xl flex items-center justify-center text-xl ring-4 ring-[#0A2540]">🧪</div>
+                        <div class="w-9 h-9 bg-white text-[#0A2540] rounded-2xl flex items-center justify-center text-xl ring-4 ring-[#0A2540]">📍</div>
+                    </div>
+                    <p class="text-white/70 max-w-[220px]">
+                        Used daily by <span class="text-[#E8B923] font-semibold">every college</span> at Pangasinan State University Bayambang Campus
+                    </p>
+                </div>
+            </div>
+            <div class="md:col-span-5 relative">
+                <div class="bg-white/5 backdrop-blur-3xl border border-white/10 rounded-3xl p-3 shadow-2xl">
+                    <div class="bg-[#001A33] rounded-3xl p-6 relative overflow-hidden">
+                        <div class="aspect-[9/16] bg-gradient-to-br from-[#0A2540] to-[#001F3F] rounded-3xl flex flex-col p-4 border border-[#E8B923]/30">
+                            <div class="flex justify-between text-xs mb-6 px-2">
+                                <div>9:41</div>
+                                <div class="flex items-center gap-x-1">98%</div>
+                            </div>
+                            <div class="text-center mb-8">
+                                <div class="inline-flex bg-[#E8B923] text-[#0A2540] text-xs font-bold px-6 py-1 rounded-3xl items-center gap-x-2">
+                                    <span class="relative flex h-3 w-3">
+                                        <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#0A2540] opacity-75"></span>
+                                        <span class="relative inline-flex rounded-full h-3 w-3 bg-[#0A2540]"></span>
+                                    </span>
+                                    LIVE CAMPUS
+                                </div>
+                            </div>
+                            <div class="flex-1 bg-[#0A2540] rounded-2xl p-4 flex items-center justify-center relative">
+                                <div class="text-center">
+                                    <p class="text-[#E8B923] text-xl font-medium">You are here</p>
+                                    <p class="text-white/60 mt-1">Room 104 • Cast Building</p>
+                                </div>
+                            </div>
+                            <div class="text-center text-xs mt-4 text-white/60 font-medium">Next class in 12 minutes • Cast Lab 2 is OPEN</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="absolute -top-4 -right-4 bg-[#E8B923] text-[#0A2540] text-sm font-bold px-5 py-2 rounded-3xl flex items-center gap-x-2 shadow-xl rotate-[-8deg]">
+                    <span>169 users online</span>
+                    <div class="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
+                </div>
+            </div>
+        </div>
+        <div class="absolute bottom-10 left-1/2 flex flex-col items-center gap-y-1 text-xs opacity-60">
+            <div class="animate-bounce">↓</div>
+            <span>Scroll for more info</span>
+        </div>
+    </section>
+
+    <!-- FEATURES -->
+    <section id="features" class="max-w-screen-2xl mx-auto px-8 py-24">
+        <div class="text-center mb-16">
+            <span class="px-5 py-1 bg-white/10 text-[#E8B923] text-sm font-semibold rounded-3xl">BSIT-WMT-2-1</span>
+            <h2 class="display-font text-5xl mt-4 tracking-[-1px]">One platform.<br>Three campus needs.</h2>
+        </div>
+        <div class="grid md:grid-cols-3 gap-8">
+            <div class="card-hover bg-white/5 border border-white/10 rounded-3xl p-8 flex flex-col">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor" class="icon icon-tabler icons-tabler-filled icon-tabler-compass"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M17 3.34a10 10 0 1 1 -15 8.66l.005 -.324a10 10 0 0 1 14.995 -8.336zm-5 14.66a1 1 0 1 0 0 2a1 1 0 0 0 0 -2m3.684 -10.949l-6 2a1 1 0 0 0 -.633 .633l-2.007 6.026l-.023 .086l-.017 .113l-.004 .068v.044l.009 .111l.012 .07l.04 .144l.045 .1l.054 .095l.064 .09l.069 .075l.084 .074l.098 .07l.1 .054l.078 .033l.105 .033l.109 .02l.043 .005l.068 .004h.044l.111 -.009l.07 -.012l.02 -.006l.019 -.002l.074 -.022l6 -2a1 1 0 0 0 .633 -.633l2 -6a1 1 0 0 0 -1.265 -1.265zm-1.265 2.529l-1.21 3.629l-3.629 1.21l1.21 -3.629l3.629 -1.21zm-9.419 1.42a1 1 0 1 0 0 2a1 1 0 0 0 0 -2m14 0a1 1 0 1 0 0 2a1 1 0 0 0 0 -2m-7 -7a1 1 0 1 0 0 2a1 1 0 0 0 0 -2"/></svg>
+                <h3 class="display-font text-3xl mb-3">Smart Room Locator</h3>
+                <p class="text-white/70 text-lg flex-1">Instantly locate any room, lab, or facility on campus with live availability and shortest-path directions.</p>
+                <div class="text-[#E8B923] text-sm font-medium mt-8">Real-time • Indoor GPS • Cast Building Covered →</div>
+            </div>
+            <div class="card-hover bg-white/5 border border-white/10 rounded-3xl p-8 flex flex-col">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-calendar-event"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M4 7a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v12a2 2 0 0 1 -2 2h-12a2 2 0 0 1 -2 -2l0 -12"/><path d="M16 3l0 4"/><path d="M8 3l0 4"/><path d="M4 11l16 0"/><path d="M8 15h2v2h-2l0 -2"/></svg>
+                <h3 class="display-font text-3xl mb-3">Intelligent Scheduling</h3>
+                <p class="text-white/70 text-lg flex-1">View, book, and manage class schedules, professor office hours, and room reservations in one beautiful calendar.</p>
+                <div class="text-[#E8B923] text-sm font-medium mt-8">Conflict-free • Sync with Google • Soon to be Faculty approved →</div>
+            </div>
+            <div class="card-hover bg-white/5 border border-white/10 rounded-3xl p-8 flex flex-col">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-device-desktop"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M3 5a1 1 0 0 1 1 -1h16a1 1 0 0 1 1 1v10a1 1 0 0 1 -1 1h-16a1 1 0 0 1 -1 -1v-10"/><path d="M7 20h10"/><path d="M9 16v4"/><path d="M15 16v4"/></svg>
+                <h3 class="display-font text-3xl mb-3">Lab Attendance + Monitoring</h3>
+                <p class="text-white/70 text-lg flex-1">Real-time attendance tracking, live lab occupancy, equipment status, and safety compliance monitoring.</p>
+                <div class="text-[#E8B923] text-sm font-medium mt-8">Face recognition ready • Instant reports • Live dashboards →</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ROOM LOCATOR -->
+    <section id="locator" class="bg-white/5 py-20">
+        <div class="max-w-screen-2xl mx-auto px-8">
+            <div class="flex flex-col md:flex-row justify-between items-end mb-12">
+                <div>
+                    <span class="text-[#E8B923] text-sm font-semibold">INTERACTIVE DEMO</span>
+                    <h2 class="display-font text-5xl tracking-[-1px]">Find any room in seconds</h2>
+                </div>
+                <div class="mt-6 md:mt-0 flex items-center gap-x-3 bg-white/10 rounded-3xl px-5 py-2">
+                    <input id="room-search" onkeyup="if(event.keyCode===13) filterRooms()" type="text"
+                           placeholder="Search rooms or buildings..."
+                           class="bg-transparent outline-none text-white placeholder:text-white/40 w-72">
+                    <button onclick="filterRooms()" class="bg-[#E8B923] text-[#0A2540] px-6 py-2 rounded-3xl font-medium">Search</button>
+                </div>
+            </div>
+            <div class="grid lg:grid-cols-12 gap-8">
+                <div class="lg:col-span-4 bg-[#001A33] rounded-3xl p-6 max-h-[560px] overflow-auto">
+                    <h4 class="font-medium mb-4 flex justify-between">
+                        <span>Results</span>
+                        <span id="result-count" class="text-[#E8B923]">5 rooms</span>
+                    </h4>
+                    <div id="rooms-list" class="space-y-3"></div>
+                </div>
+                <div class="lg:col-span-8 bg-[#001A33] rounded-3xl p-8 relative">
+                    <div class="flex justify-between mb-6">
+                        <div class="text-sm flex items-center gap-x-2">
+                            <span class="font-semibold">Cast Building • Floor 1</span>
+                            <span onclick="changeFloor()" class="cursor-pointer text-[#E8B923] underline">Change floor →</span>
+                        </div>
+                        <span class="px-3 py-1 bg-green-400/20 text-green-400 rounded-3xl text-xs uppercase tracking-widest font-medium">LIVE</span>
+                    </div>
+                    <svg id="map-svg" width="100%" height="420" viewBox="0 0 800 420" fill="none" xmlns="http://www.w3.org/2000/svg" class="w-full">
+                        <rect width="800" height="420" fill="#0A2540" rx="20"/>
+                        <rect x="80" y="80" width="640" height="20" fill="#E8B923" fill-opacity="0.15"/>
+                        <rect x="80" y="220" width="640" height="20" fill="#E8B923" fill-opacity="0.15"/>
+                        <rect x="120" y="120" width="110" height="80" rx="12" fill="#112C4F" stroke="#E8B923" stroke-width="6" id="room-301" onclick="selectRoom(301)" class="cursor-pointer"/>
+                        <text x="145" y="160" fill="#E8B923" font-size="22" font-weight="600">Lab 1</text>
+                        <text x="145" y="185" fill="#fff" font-size="13">Lecture</text>
+                        <rect x="260" y="120" width="110" height="80" rx="12" fill="#112C4F" stroke="#E8B923" stroke-width="6" id="room-302" onclick="selectRoom(302)" class="cursor-pointer"/>
+                        <text x="285" y="160" fill="#E8B923" font-size="22" font-weight="600">106</text>
+                        <text x="285" y="185" fill="#fff" font-size="13">Lecture</text>
+                        <rect x="400" y="120" width="110" height="80" rx="12" fill="#112C4F" stroke="#E8B923" stroke-width="6" id="room-303" onclick="selectRoom(303)" class="cursor-pointer"/>
+                        <text x="425" y="160" fill="#E8B923" font-size="22" font-weight="600">107</text>
+                        <text x="425" y="185" fill="#fff" font-size="13">Lecture</text>
+                        <rect x="540" y="120" width="110" height="80" rx="12" fill="#112C4F" stroke="#E8B923" stroke-width="6" id="room-304" onclick="selectRoom(304)" class="cursor-pointer"/>
+                        <text x="565" y="160" fill="#E8B923" font-size="22" font-weight="600">Lab 2</text>
+                        <text x="565" y="185" fill="#fff" font-size="13">Hands on</text>
+                        <circle cx="670" cy="280" r="18" fill="#E8B923" opacity="0.3"/>
+                        <circle cx="670" cy="280" r="12" fill="#E8B923"/>
+                        <text x="670" y="286" text-anchor="middle" fill="#0A2540" font-size="18" font-weight="700">YOU</text>
+                    </svg>
+                    <div id="room-detail-panel" class="absolute bottom-8 right-8 bg-white/10 backdrop-blur-xl border border-[#E8B923] rounded-3xl p-6 w-80 hidden">
+                        <h4 id="detail-title" class="display-font text-2xl"></h4>
+                        <p id="detail-subtitle" class="text-white/70"></p>
+                        <div class="my-6 flex gap-x-6">
+                            <div><div class="text-xs uppercase">Status</div><div id="detail-status" class="font-medium"></div></div>
+                            <div><div class="text-xs uppercase">Est. walk time</div><div id="detail-time" class="font-medium text-[#E8B923]"></div></div>
+                        </div>
+                        <button onclick="hideDetailPanel()" class="text-sm px-8 py-4 w-full bg-[#E8B923] text-[#0A2540] font-semibold rounded-3xl">Get walking directions</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- SCHEDULING -->
+    <section id="schedule" class="max-w-screen-2xl mx-auto px-8 py-24">
+        <div class="grid md:grid-cols-12 gap-12 items-center">
+            <div class="md:col-span-5">
+                <span class="text-[#E8B923]">Schedules Demo</span>
+                <h2 class="display-font text-5xl tracking-[-1px] mt-2">Your week at a glance</h2>
+                <p class="text-white/70 text-xl mt-4">Drag, drop, and instantly see conflicts. Syncs with your professors and lab schedules.</p>
+                <div class="mt-8 bg-white/5 border border-white/10 rounded-3xl p-6">
+                    <div class="flex justify-between text-xs mb-4">
+                        <span class="font-medium">May 20-27, 2026</span>
+                        <span class="text-[#E8B923]">Week 8 • Midterms</span>
+                    </div>
+                    <div class="grid grid-cols-7 gap-px bg-white/10 rounded-2xl overflow-hidden text-center text-xs">
+                        <div class="bg-[#0A2540] py-3">Mon</div>
+                        <div class="bg-[#0A2540] py-3">Tue</div>
+                        <div class="bg-[#0A2540] py-3 text-[#E8B923]">Wed</div>
+                        <div class="bg-[#0A2540] py-3">Thu</div>
+                        <div class="bg-[#0A2540] py-3">Fri</div>
+                        <div class="bg-[#0A2540] py-3">Sat</div>
+                        <div class="bg-[#0A2540] py-3">Sun</div>
+                        <div onclick="mockCalendarClick(this)" class="bg-[#112C4F] p-2 text-left text-[10px] cursor-pointer">9AM<br><span class="font-medium">MT101 • Room 106</span></div>
+                        <div class="bg-transparent p-2 text-left text-[10px]"></div>
+                        <div onclick="mockCalendarClick(this)" class="bg-[#112C4F] p-2 text-left text-[10px] cursor-pointer">10AM<br><span class="font-medium">CC105 • Rm107</span></div>
+                        <div class="bg-transparent p-2"></div>
+                        <div onclick="mockCalendarClick(this)" class="bg-[#112C4F] p-2 text-left text-[10px] cursor-pointer">1PM<br><span class="font-medium">WEBDEV • Lab 3</span></div>
+                        <div class="bg-transparent p-2"></div>
+                        <div class="bg-transparent p-2"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="md:col-span-7">
+                <div class="bg-gradient-to-br from-[#112C4F] to-[#0A2540] rounded-3xl p-8 shadow-inner">
+                    <div id="calendar-detail" class="hidden">
+                        <h4 class="text-3xl display-font mb-1">MT101 • Lecture</h4>
+                        <p class="text-[#E8B923]">Wednesday • 10:00 AM • Room 106 • Prof. Sir Wendell</p>
+                        <div class="mt-8 grid grid-cols-2 gap-6 text-sm">
+                            <div>📍 <span class="font-medium">Cast Building, 1st floor</span></div>
+                            <div>👥 <span class="font-medium">45 students enrolled</span></div>
+                            <div>⏳ <span class="font-medium">1 hour 30 minutes</span></div>
+                            <div>📌 <span class="font-medium">No conflicts detected</span></div>
+                        </div>
+                        <button onclick="hideCalendarDetail()" class="mt-10 text-sm uppercase tracking-widest px-8 py-3 border border-white/30 rounded-3xl hover:bg-white/10">Close preview</button>
+                    </div>
+                    <p id="calendar-placeholder" class="text-center text-white/40 py-12">Click any slot above to preview details</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ============================================================
+         ABOUT — only ONE section here, fully outside any script tag
+    ============================================================ -->
+    <section id="about" class="about-section">
+        <div class="about-container">
+
+            <div class="about-left">
+                <span class="about-eyebrow">About the Project</span>
+                <h2 class="about-heading">Built for Pangasinan State University</h2>
+                <p class="about-lead">
+                    Navi Track was created by frontend developers and PSU students
+                    to solve real campus pain points: lost time finding rooms,
+                    clashing schedules, and manual lab attendance sheets.
+                </p>
+                <div class="about-divider"></div>
+                <p class="about-version">Version 2.4 &nbsp;·&nbsp; May 2026</p>
+                <div class="about-problem">
+                    <span class="about-problem-label">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none"
+                             stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="12" cy="12" r="10"/>
+                            <line x1="12" y1="8" x2="12" y2="12"/>
+                            <line x1="12" y1="16" x2="12.01" y2="16"/>
+                        </svg>
+                        Problem Statement
+                    </span>
+                    <p class="about-problem-text">
+                        PSU Bayambang students and faculty face three recurring challenges:
+                        navigating unfamiliar classrooms, resolving schedule conflicts, and
+                        maintaining paper-based lab attendance records. Navi Track eliminates
+                        all three through a unified, no-download-required web platform built
+                        around PSU's blue-and-gold identity.
+                    </p>
+                </div>
+            </div>
+
+            <div class="about-right">
+                <div class="about-meta-grid">
+                    <div class="about-meta-card">
+                        <span class="meta-label">System Analysis and Design Period</span>
+                        <span class="meta-value">A.Y. 2025 – 2026</span>
+                    </div>
+                    <div class="about-meta-card">
+                        <span class="meta-label">Course / Section</span>
+                        <span class="meta-value">BSIT-WMT-2-1</span>
+                    </div>
+                    <div class="about-meta-card">
+                        <span class="meta-label">Campus</span>
+                        <span class="meta-value">PSU Bayambang</span>
+                    </div>
+                    <div class="about-meta-card">
+                        <span class="meta-label">Sub-systems</span>
+                        <span class="meta-value">2 Modules</span>
+                    </div>
+                </div>
+
+                <div class="about-subsystems">
+                    <p class="about-block-label">Core Sub-systems</p>
+                    <div class="subsystem-card">
+                        <div class="subsystem-icon">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none"
+                                 stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M21 10c0 7-9 13-9 13S3 17 3 10a9 9 0 0 1 18 0z"/>
+                                <circle cx="12" cy="10" r="3"/>
+                            </svg>
+                        </div>
+                        <div class="subsystem-info">
+                            <span class="subsystem-name">CampusNav 2</span>
+                            <span class="subsystem-desc">Interactive room locator and real-time class scheduling viewer for students and faculty.</span>
+                        </div>
+                    </div>
+                    <div class="subsystem-card">
+                        <div class="subsystem-icon">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none"
+                                 stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <rect x="3" y="3" width="7" height="7"/>
+                                <rect x="14" y="3" width="7" height="7"/>
+                                <rect x="3" y="14" width="7" height="7"/>
+                                <path d="M14 14h3v3h-3z"/><path d="M17 17h3v3h-3z"/><path d="M14 20h3"/>
+                            </svg>
+                        </div>
+                        <div class="subsystem-info">
+                            <span class="subsystem-name">BSIT SmartLog</span>
+                            <span class="subsystem-desc">QR-based lab attendance tracking system with automated logging and export support.</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="about-stack">
+                    <p class="about-block-label">Tech Stack</p>
+                    <div class="stack-pills">
+                        <span class="stack-pill gold">HTML</span>
+                        <span class="stack-pill gold">CSS</span>
+                        <span class="stack-pill gold">JavaScript</span>
+                        <span class="stack-pill gold">MySQL</span>
+                        <span class="stack-pill gold">PHP</span>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="about-team-section">
+            <p class="about-block-label centered">Development Team</p>
+            <div class="team-grid">
+                <div class="team-card">
+                    <div class="team-avatar">JV</div>
+                    <div class="team-info">
+                        <span class="team-name">Joshua Vince Junio II</span>
+                        <span class="team-role">Frontend Developer · UI/UX Design</span>
+                    </div>
+                </div>
+                <div class="team-card">
+                    <div class="team-avatar">EJ</div>
+                    <div class="team-info">
+                        <span class="team-name">Elijah Josh Fajardo</span>
+                        <span class="team-role">Backend Developer · Database/Logic</span>
+                    </div>
+                </div>
+                <div class="team-card">
+                    <div class="team-avatar">VI</div>
+                    <div class="team-info">
+                        <span class="team-name">Viktor Isaac Arcega</span>
+                        <span class="team-role">Thesis Papers · Troubleshooting</span>
+                    </div>
+                </div>
+                <div class="team-card">
+                    <div class="team-avatar">JI</div>
+                    <div class="team-info">
+                        <span class="team-name">Jesreel Ignacio Calimlim</span>
+                        <span class="team-role">Figma · Thesis Papers</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <script src="mainuser.js"></script>
+</body>  
+</html>

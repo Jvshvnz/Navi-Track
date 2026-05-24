@@ -1,0 +1,196 @@
+/* ===== FONTS ===== */
+        .display-font { font-family: 'Space Grotesk', sans-serif; }
+        body { font-family: 'Instrument Sans', sans-serif; }
+
+        /* ===== LOADING SCREEN ===== */
+        #loading-screen {
+            position: fixed; inset: 0;
+            background: #0A2540;
+            display: flex; align-items: center; justify-content: center;
+            z-index: 9999;
+            transition: opacity 0.68s ease;
+        }
+        #loading-screen.fade-out { opacity: 0; pointer-events: none; }
+
+        .loader-glow {
+            position: absolute;
+            width: 400px; height: 400px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(232,185,35,0.12) 0%, transparent 70%);
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            pointer-events: none;
+        }
+
+        .loader-container {
+            display: flex; flex-direction: column;
+            align-items: center; gap: 20px;
+            position: relative; z-index: 1;
+        }
+
+        .compass-ring {
+            width: 112px; height: 112px;
+            position: relative;
+            animation: spin 8s linear infinite;
+        }
+        .compass-ring svg { position: absolute; inset: 0; width: 100%; height: 100%; }
+
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        .compass-inner {
+            position: absolute;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            width: 56px; height: 56px;
+            background: rgba(232,185,35,0.15);
+            border: 1px solid rgba(232,185,35,0.4);
+            border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+        }
+
+        .needle {
+            position: absolute;
+            left: 50%; transform: translateX(-50%);
+            width: 3px; border-radius: 2px;
+        }
+        .needle-north {
+            height: 18px; top: 4px;
+            background: #E8B923;
+            animation: pulse-needle 2s ease-in-out infinite;
+        }
+        @keyframes pulse-needle {
+            0%,100% { opacity: 1; }
+            50% { opacity: 0.4; }
+        }
+
+        .brand-title {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 2rem; font-weight: 600;
+            color: #fff; letter-spacing: -0.5px;
+        }
+        .brand-sub {
+            font-size: 0.85rem; color: rgba(255,255,255,0.45);
+            letter-spacing: 0.08em; text-transform: uppercase;
+            margin-top: -14px;
+        }
+
+        .progress-area { width: 260px; }
+        .progress-label {
+            display: flex; justify-content: space-between;
+            font-size: 0.75rem; color: rgba(255,255,255,0.5);
+            margin-bottom: 8px;
+        }
+        .progress-track {
+            height: 3px; background: rgba(255,255,255,0.1);
+            border-radius: 99px; overflow: hidden;
+        }
+        .progress-fill {
+            height: 100%; width: 0%;
+            background: #E8B923;
+            border-radius: 99px;
+            transition: width 0.35s cubic-bezier(0.4,0,0.2,1);
+        }
+
+        .loader-dots { display: flex; gap: 6px; margin-top: 4px; }
+        .loader-dots span {
+            width: 5px; height: 5px;
+            background: rgba(232,185,35,0.5);
+            border-radius: 50%;
+            animation: dot-bounce 1.2s ease-in-out infinite;
+        }
+        .loader-dots span:nth-child(2) { animation-delay: 0.2s; }
+        .loader-dots span:nth-child(3) { animation-delay: 0.4s; }
+        @keyframes dot-bounce {
+            0%,80%,100% { transform: scale(1); opacity: 0.5; }
+            40% { transform: scale(1.4); opacity: 1; }
+        }
+
+        /* ===== ADMIN PANEL ===== */
+        .admin-nav-item { color: rgba(255,255,255,0.5); transition: all 0.2s; }
+        .admin-nav-item:hover { color: #fff; background: rgba(255,255,255,0.07); }
+        .admin-nav-item.active { color: #E8B923; background: rgba(232,185,35,0.12); }
+
+        .page { animation: fadeInUp 0.3s ease; }
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(12px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+
+        /* ===== TABLE ROWS ===== */
+        #users-body tr, #rooms-body tr {
+            border-bottom: 1px solid rgba(255,255,255,0.06);
+            transition: background 0.15s;
+        }
+        #users-body tr:hover, #rooms-body tr:hover {
+            background: rgba(255,255,255,0.04);
+        }
+
+        /* ===== INLINE TABLE ELEMENT STYLES ===== */
+        .student-id {
+            font-family: 'Courier New', monospace;
+            font-size: 0.8rem;
+            color: rgba(255,255,255,0.6);
+        }
+        .student-name { font-weight: 500; }
+
+        .year-badge {
+            display: inline-block;
+            font-size: 0.75rem;
+            font-weight: 600;
+            padding: 2px 10px;
+            border-radius: 99px;
+            background: rgba(232,185,35,0.15);
+            color: #E8B923;
+        }
+
+        .course-badge {
+            display: inline-block;
+            font-size: 0.7rem;
+            font-weight: 700;
+            padding: 2px 8px;
+            border-radius: 6px;
+            background: rgba(232,185,35,0.15);
+            color: #E8B923;
+            margin-right: 6px;
+        }
+
+        .email-text {
+            color: rgba(255,255,255,0.5);
+            font-size: 0.85rem;
+        }
+
+        /* ===== STATUS BADGES ===== */
+        .status-active {
+            display: inline-block;
+            padding: 3px 12px;
+            border-radius: 99px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            background: rgba(16,185,129,0.2);
+            color: #34d399;
+        }
+        .status-inactive {
+            display: inline-block;
+            padding: 3px 12px;
+            border-radius: 99px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            background: rgba(255,255,255,0.08);
+            color: rgba(255,255,255,0.4);
+        }
+
+        /* ===== ACTION BUTTONS ===== */
+        .edit-btn {
+            padding: 6px 18px;
+            font-size: 0.8rem;
+            border: 1px solid rgba(255,255,255,0.25);
+            border-radius: 10px;
+            background: transparent;
+            color: #fff;
+            cursor: pointer;
+            transition: border-color 0.15s, color 0.15s;
+        }
+        .edit-btn:hover {
+            border-color: #E8B923;
+            color: #E8B923;
+        }
