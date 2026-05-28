@@ -11,7 +11,7 @@ global $conn;
 //}
 
 $username = $_POST['username'];
-$password = $_POST['password'];
+$password = $_POST['password'];`
 
 $sql = "SELECT * FROM users WHERE username='$username' AND password='$password'";
 $result = mysqli_query($conn, $sql);
@@ -22,13 +22,19 @@ if (mysqli_num_rows($result) > 0) {
     $_SESSION['username'] = $row['username'];
     $_SESSION['role'] = $row['role'];
 
-    //role check
-    if($row ['role'] == 'admin'){
+    if ($row['role'] == 'admin') {
         header('Location: ../Sys_Admin/index.php');
-    }else{
-        echo "Invalid Role";
+        exit;
+    } elseif ($row['role'] == 'teacher') {
+        header('Location: ../Sys_Teacher/index.php');
+        exit;
+    } elseif ($row['role'] == 'student') {
+        header('Location: ../Sys_User/index.php');
+        exit;
+    } else {
+        echo "Invalid credentials, please check carefully.";
     }
 } else {
-    echo "Invalid Login";
+    echo "Invalid credentials, please check carefully.";
 }
 ?>

@@ -75,7 +75,7 @@ $Page = "Login Page";
                 </div>
 
                 <!-- Form -->
-                <form action="../Sys_Database/Login_conn.php" method="post" id="loginForm" class="space-y-6">
+                <form action= "../Sys_Database/Login_conn.php" method="post" id="loginForm" class="space-y-6">
                     
                     <!-- Identifier -->
                     <div>
@@ -88,7 +88,7 @@ $Page = "Login Page";
                                 class="input-field w-full pl-12 pr-5 py-4 rounded-2xl text-base placeholder-slate-500 focus:outline-none"
                                 placeholder="caralos@psu.edu.ph" required>
                         </div>
-                    </div>
+                    </div>  
 
                     <!-- Password -->
                     <div>

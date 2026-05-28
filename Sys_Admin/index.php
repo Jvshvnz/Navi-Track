@@ -1,7 +1,7 @@
 <?php
 session_start();
 if (!isset($_SESSION['role']) || $_SESSION['role'] != 'admin'){
-    header('Location: /Navi-Track/Sys_Login/index.php');
+    header('Location: ../Sys_Login/index.php');
     exit();
 }
 ?>
