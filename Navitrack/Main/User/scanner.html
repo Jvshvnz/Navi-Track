@@ -1,0 +1,854 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+
+<title>NaviTrack • Room Verification Scanner</title>
+
+<!-- Tailwind CDN -->
+<script src="https://cdn.tailwindcss.com"></script>
+
+<!-- Fonts -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+<!-- html5-qrcode -->
+<script src="https://unpkg.com/html5-qrcode"></script>
+
+<style>
+    *{
+        font-family: 'Space Grotesk', sans-serif;
+    }
+
+    body{
+        overflow-x:hidden;
+        background:#060816;
+        color:white;
+    }
+
+    /* ===== Animated futuristic background ===== */
+    .bg-grid{
+        position:fixed;
+        inset:0;
+        background:
+            linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px),
+            linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px);
+        background-size:40px 40px;
+        z-index:-3;
+        mask-image: radial-gradient(circle at center, black 40%, transparent 90%);
+    }
+
+    .bg-glow{
+        position:fixed;
+        width:700px;
+        height:700px;
+        border-radius:50%;
+        filter: blur(100px);
+        opacity:0.25;
+        z-index:-2;
+        animation: floatGlow 12s infinite ease-in-out alternate;
+    }
+
+    .glow1{
+        background:#00e5ff;
+        top:-200px;
+        left:-200px;
+    }
+
+    .glow2{
+        background:#4f46e5;
+        bottom:-200px;
+        right:-200px;
+        animation-delay:4s;
+    }
+
+    @keyframes floatGlow{
+        from{
+            transform:translateY(0px) translateX(0px) scale(1);
+        }
+        to{
+            transform:translateY(40px) translateX(30px) scale(1.1);
+        }
+    }
+
+    /* ===== Glassmorphism ===== */
+    .glass{
+        background:rgba(255,255,255,0.06);
+        border:1px solid rgba(255,255,255,0.1);
+        backdrop-filter: blur(18px);
+        -webkit-backdrop-filter: blur(18px);
+        box-shadow:
+            0 0 30px rgba(0,229,255,0.08),
+            inset 0 0 20px rgba(255,255,255,0.03);
+    }
+
+    /* ===== Scanner Box ===== */
+    .scanner-wrapper{
+        position:relative;
+        overflow:hidden;
+        border-radius:28px;
+        padding:8px;
+        background:linear-gradient(
+            135deg,
+            rgba(0,229,255,0.4),
+            rgba(99,102,241,0.3)
+        );
+        box-shadow:
+            0 0 30px rgba(0,229,255,0.3),
+            0 0 80px rgba(79,70,229,0.2);
+    }
+
+    .scanner-frame{
+        position:relative;
+        border-radius:22px;
+        overflow:hidden;
+        background:#000;
+    }
+
+    #reader{
+        width:100%;
+        border:none !important;
+    }
+
+    #reader video{
+        border-radius:22px !important;
+        object-fit:cover !important;
+    }
+
+    /* Remove html5-qrcode default styles */
+    #reader__dashboard{
+        display:none !important;
+    }
+
+    #reader__scan_region{
+        border:none !important;
+    }
+
+    /* ===== Animated Scan Line ===== */
+    .scan-line{
+        position:absolute;
+        left:10%;
+        width:80%;
+        height:3px;
+        background:linear-gradient(
+            90deg,
+            transparent,
+            #00e5ff,
+            transparent
+        );
+        box-shadow:0 0 20px #00e5ff;
+        animation: scanMove 2.5s linear infinite;
+        z-index:5;
+    }
+
+    @keyframes scanMove{
+        0%{
+            top:10%;
+        }
+        100%{
+            top:90%;
+        }
+    }
+
+    /* ===== Corner Borders ===== */
+    .corner{
+        position:absolute;
+        width:50px;
+        height:50px;
+        border:4px solid #00e5ff;
+        z-index:6;
+        filter:drop-shadow(0 0 10px #00e5ff);
+    }
+
+    .tl{
+        top:18px;
+        left:18px;
+        border-right:none;
+        border-bottom:none;
+        border-radius:16px 0 0 0;
+    }
+
+    .tr{
+        top:18px;
+        right:18px;
+        border-left:none;
+        border-bottom:none;
+        border-radius:0 16px 0 0;
+    }
+
+    .bl{
+        bottom:18px;
+        left:18px;
+        border-right:none;
+        border-top:none;
+        border-radius:0 0 0 16px;
+    }
+
+    .br{
+        bottom:18px;
+        right:18px;
+        border-left:none;
+        border-top:none;
+        border-radius:0 0 16px 0;
+    }
+
+    /* ===== Buttons ===== */
+    .navibtn{
+        position:relative;
+        overflow:hidden;
+        transition:all .3s ease;
+    }
+
+    .navibtn:hover{
+        transform:translateY(-2px);
+        box-shadow:0 0 25px rgba(0,229,255,0.25);
+    }
+
+    .navibtn:active{
+        transform:scale(.97);
+    }
+
+    /* ===== Status Badge ===== */
+    .status-badge{
+        animation:pulseGlow 2s infinite;
+    }
+
+    @keyframes pulseGlow{
+        0%{
+            box-shadow:0 0 0 rgba(0,229,255,0.2);
+        }
+        50%{
+            box-shadow:0 0 25px rgba(0,229,255,0.4);
+        }
+        100%{
+            box-shadow:0 0 0 rgba(0,229,255,0.2);
+        }
+    }
+
+    /* ===== Verification Animation ===== */
+    .success-ring{
+        animation:popRing 1s ease;
+    }
+
+    @keyframes popRing{
+        0%{
+            transform:scale(.5);
+            opacity:0;
+        }
+        100%{
+            transform:scale(1);
+            opacity:1;
+        }
+    }
+
+    /* ===== Scrollbar ===== */
+    ::-webkit-scrollbar{
+        width:8px;
+    }
+
+    ::-webkit-scrollbar-thumb{
+        background:#1e3a8a;
+        border-radius:10px;
+    }
+
+    /* ===== Mobile Optimization ===== */
+    @media(max-width:768px){
+        .scanner-wrapper{
+            border-radius:22px;
+        }
+    }
+</style>
+</head>
+<body>
+
+<!-- Animated Background -->
+<div class="bg-grid"></div>
+<div class="bg-glow glow1"></div>
+<div class="bg-glow glow2"></div>
+
+<div class="min-h-screen p-4 md:p-8">
+
+    <!-- Header -->
+    <div class="max-w-7xl mx-auto mb-6 flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4">
+
+        <div>
+            <h1 class="text-4xl md:text-5xl font-bold bg-gradient-to-r from-cyan-300 via-blue-400 to-indigo-400 bg-clip-text text-transparent">
+                NaviTrack
+            </h1>
+
+            <p class="text-slate-300 mt-2 text-sm md:text-base">
+                Smart Campus • QR Room Verification System
+            </p>
+        </div>
+
+        <div class="glass rounded-2xl px-5 py-3 flex items-center gap-3">
+            <div class="w-3 h-3 rounded-full bg-emerald-400 animate-pulse"></div>
+            <span class="text-sm text-slate-200">
+                <span id="liveTime"></span>
+            </span>
+        </div>
+
+    </div>
+
+    <!-- Main Layout -->
+    <div class="max-w-7xl mx-auto grid grid-cols-1 xl:grid-cols-3 gap-6">
+
+        <!-- Scanner Section -->
+        <div class="xl:col-span-2">
+
+            <div class="glass rounded-[30px] p-5 md:p-7">
+
+                <!-- Top Status -->
+                <div class="flex items-center justify-between mb-6">
+
+                    <div>
+                        <h2 class="text-2xl font-semibold">
+                            Room Verification Scanner
+                        </h2>
+
+                        <p class="text-slate-400 mt-1 text-sm">
+                            Scan QR codes outside classrooms to verify room identity.
+                        </p>
+                    </div>
+
+                    <div id="statusBadge"
+                         class="status-badge px-4 py-2 rounded-full text-sm font-semibold bg-cyan-500/20 border border-cyan-400/30 text-cyan-300">
+                        Ready
+                    </div>
+
+                </div>
+
+                <!-- Scanner -->
+                <div class="scanner-wrapper">
+
+                    <div class="scanner-frame">
+
+                        <div id="reader"></div>
+
+                        <!-- Scanner Overlay -->
+                        <div class="corner tl"></div>
+                        <div class="corner tr"></div>
+                        <div class="corner bl"></div>
+                        <div class="corner br"></div>
+
+                        <div class="scan-line"></div>
+
+                    </div>
+
+                </div>
+
+                <!-- Controls -->
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mt-6">
+
+                    <button id="startBtn"
+                        class="navibtn rounded-2xl bg-cyan-500/20 border border-cyan-400/30 py-4 font-medium">
+                        ▶ Start Scanner
+                    </button>
+
+                    <button id="stopBtn"
+                        class="navibtn rounded-2xl bg-red-500/20 border border-red-400/30 py-4 font-medium">
+                        ■ Stop Scanner
+                    </button>
+
+
+                </div>
+
+                <!-- Permission Error -->
+                <div id="errorBox"
+                     class="hidden mt-5 rounded-2xl border border-red-400/30 bg-red-500/10 p-4 text-red-200">
+                </div>
+
+            </div>
+
+            <!-- Room Info -->
+            <div id="roomPanel"
+                 class="glass rounded-[30px] p-6 mt-6 hidden success-ring">
+
+                <div class="flex items-center gap-4 mb-6">
+
+                    <div class="w-16 h-16 rounded-2xl bg-emerald-500/20 border border-emerald-400/30 flex items-center justify-center text-3xl">
+                        ✓
+                    </div>
+
+                    <div>
+                        <h2 class="text-2xl font-bold text-emerald-300">
+                            Room Verified Successfully
+                        </h2>
+
+                        <p class="text-slate-300 mt-1">
+                            QR authentication completed.
+                        </p>
+                    </div>
+
+                </div>
+
+                <div id="roomDetails"
+                     class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                </div>
+
+            </div>
+
+        </div>
+
+        <!-- Sidebar -->
+        <div class="space-y-6">
+
+            <!-- Scan History -->
+            <div class="glass rounded-[30px] p-6">
+
+                <div class="flex items-center justify-between mb-5">
+                    <h3 class="text-xl font-semibold">
+                        Scan History
+                    </h3>
+
+                    <span class="text-xs text-slate-400">
+                        Recent Activity
+                    </span>
+                </div>
+
+                <div id="historyList"
+                     class="space-y-3 max-h-[500px] overflow-auto">
+                </div>
+
+            </div>
+
+            <!-- Instructions -->
+            <div class="glass rounded-[30px] p-6">
+
+                <h3 class="text-xl font-semibold mb-4">
+                    Scanner Guide
+                </h3>
+
+                <ul class="space-y-3 text-sm text-slate-300">
+
+                    <li class="flex gap-3">
+                        <span class="text-cyan-300">01</span>
+                        Point the camera at the room QR code.
+                    </li>
+
+                    <li class="flex gap-3">
+                        <span class="text-cyan-300">02</span>
+                        Verification will happen automatically.
+                    </li>
+
+                    <li class="flex gap-3">
+                        <span class="text-cyan-300">03</span>
+                        Room details and availability will appear.
+                    </li>
+
+                    <li class="flex gap-3">
+                        <span class="text-cyan-300">04</span>
+                        Scanner stops after successful verification.
+                    </li>
+
+                </ul>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+<script>
+/* =========================================================
+   Dummy Room Database
+========================================================= */
+
+const roomDatabase = {
+    "ROOM-101": {
+        room: "ROOM-101",
+        building: "CAST Building",
+        floor: "1st Floor",
+        status: "Vacant",
+        department: "BSIT Department",
+        schedule: "No active class"
+    },
+
+    "ROOM-205": {
+        room: "ROOM-205",
+        building: "Engineering Building",
+        floor: "2nd Floor",
+        status: "Occupied",
+        department: "BSBA Department",
+        schedule: "8:00 AM - 11:00 AM"
+    },
+
+    "CAST-LAB-3": {
+        room: "CAST-LAB-3",
+        building: "CAST Building",
+        floor: "3rd Floor",
+        status: "Maintenance",
+        department: "Computer Laboratory",
+        schedule: "Unavailable"
+    },
+
+    "IT-LAB-A": {
+        room: "IT-LAB-A",
+        building: "IT Center",
+        floor: "4th Floor",
+        status: "Reserved",
+        department: "Information Technology",
+        schedule: "Research Presentation"
+    }
+};
+
+/* =========================================================
+   Global Variables
+========================================================= */
+
+let html5QrCode;
+let currentCamera = "environment";
+let scannerRunning = false;
+
+/* =========================================================
+   DOM Elements
+========================================================= */
+
+const statusBadge = document.getElementById("statusBadge");
+const roomPanel = document.getElementById("roomPanel");
+const roomDetails = document.getElementById("roomDetails");
+const historyList = document.getElementById("historyList");
+const errorBox = document.getElementById("errorBox");
+
+/* =========================================================
+   Live Clock
+========================================================= */
+
+function updateClock(){
+    const now = new Date();
+
+    document.getElementById("liveTime").innerText =
+        now.toLocaleString();
+}
+
+setInterval(updateClock, 1000);
+updateClock();
+
+/* =========================================================
+   Status Update
+========================================================= */
+
+function setStatus(text, colorClass){
+    statusBadge.innerText = text;
+
+    statusBadge.className =
+        `status-badge px-4 py-2 rounded-full text-sm font-semibold ${colorClass}`;
+}
+
+/* =========================================================
+   Beep Feedback
+========================================================= */
+
+function playSuccessSound(){
+
+    const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+
+    const oscillator = audioContext.createOscillator();
+    const gainNode = audioContext.createGain();
+
+    oscillator.connect(gainNode);
+    gainNode.connect(audioContext.destination);
+
+    oscillator.type = "sine";
+    oscillator.frequency.value = 880;
+
+    oscillator.start();
+
+    gainNode.gain.exponentialRampToValueAtTime(
+        0.0001,
+        audioContext.currentTime + 0.3
+    );
+
+    if(navigator.vibrate){
+        navigator.vibrate(150);
+    }
+
+    oscillator.stop(audioContext.currentTime + 0.3);
+}
+
+/* =========================================================
+   Add Scan History
+========================================================= */
+
+function addHistory(text, success = true){
+
+    const item = document.createElement("div");
+
+    item.className =
+        `rounded-2xl p-4 border ${
+            success
+            ? "bg-emerald-500/10 border-emerald-400/20"
+            : "bg-red-500/10 border-red-400/20"
+        }`;
+
+    item.innerHTML = `
+        <div class="flex justify-between items-start">
+            <div>
+                <p class="font-medium">${text}</p>
+                <p class="text-xs text-slate-400 mt-1">
+                    ${new Date().toLocaleTimeString()}
+                </p>
+            </div>
+
+            <div class="text-xl">
+                ${success ? "✓" : "✕"}
+            </div>
+        </div>
+    `;
+
+    historyList.prepend(item);
+}
+
+/* =========================================================
+   Render Room Information
+========================================================= */
+
+function renderRoomInfo(data){
+
+    roomPanel.classList.remove("hidden");
+
+    const statusColor = {
+        "Vacant":"text-emerald-300 border-emerald-400/30 bg-emerald-500/10",
+        "Occupied":"text-red-300 border-red-400/30 bg-red-500/10",
+        "Maintenance":"text-yellow-300 border-yellow-400/30 bg-yellow-500/10",
+        "Reserved":"text-indigo-300 border-indigo-400/30 bg-indigo-500/10"
+    };
+
+    roomDetails.innerHTML = `
+        <div class="glass rounded-2xl p-5">
+            <p class="text-slate-400 text-sm">Room Number</p>
+            <h3 class="text-2xl font-bold mt-1">${data.room}</h3>
+        </div>
+
+        <div class="glass rounded-2xl p-5">
+            <p class="text-slate-400 text-sm">Building</p>
+            <h3 class="text-xl font-semibold mt-1">${data.building}</h3>
+        </div>
+
+        <div class="glass rounded-2xl p-5">
+            <p class="text-slate-400 text-sm">Floor</p>
+            <h3 class="text-xl font-semibold mt-1">${data.floor}</h3>
+        </div>
+
+        <div class="glass rounded-2xl p-5">
+            <p class="text-slate-400 text-sm mb-2">Room Status</p>
+
+            <span class="px-4 py-2 rounded-full border text-sm font-semibold ${statusColor[data.status]}">
+                ${data.status}
+            </span>
+        </div>
+
+        <div class="glass rounded-2xl p-5">
+            <p class="text-slate-400 text-sm">Assigned Department</p>
+            <h3 class="text-lg font-semibold mt-1">${data.department}</h3>
+        </div>
+
+        <div class="glass rounded-2xl p-5">
+            <p class="text-slate-400 text-sm">Current Schedule</p>
+            <h3 class="text-lg font-semibold mt-1">${data.schedule}</h3>
+        </div>
+    `;
+}
+
+/* =========================================================
+   Handle QR Scan Success
+========================================================= */
+
+async function onScanSuccess(decodedText){
+
+    if(!scannerRunning) return;
+
+    setStatus(
+        "Verifying...",
+        "bg-yellow-500/20 border border-yellow-400/30 text-yellow-300"
+    );
+
+    // Simulate API fetching delay
+    await new Promise(resolve => setTimeout(resolve, 1200));
+
+    const roomData = roomDatabase[decodedText];
+
+    if(roomData){
+
+        playSuccessSound();
+
+        setStatus(
+            "Verified",
+            "bg-emerald-500/20 border border-emerald-400/30 text-emerald-300"
+        );
+
+        renderRoomInfo(roomData);
+
+        addHistory(`Verified ${decodedText}`, true);
+
+        // Auto stop scanner
+        stopScanner();
+
+    } else {
+
+        setStatus(
+            "Invalid QR",
+            "bg-red-500/20 border border-red-400/30 text-red-300"
+        );
+
+        addHistory(`Invalid QR: ${decodedText}`, false);
+    }
+}
+
+/* =========================================================
+   Start Scanner
+========================================================= */
+
+async function startScanner(){
+
+    if(scannerRunning) return;
+
+    roomPanel.classList.add("hidden");
+
+    setStatus(
+        "Scanning...",
+        "bg-cyan-500/20 border border-cyan-400/30 text-cyan-300"
+    );
+
+    errorBox.classList.add("hidden");
+
+    html5QrCode = new Html5Qrcode("reader");
+
+    try{
+
+        await html5QrCode.start(
+            {
+                facingMode: currentCamera
+            },
+            {
+                fps: 10,
+                qrbox: {
+                    width: 250,
+                    height: 250
+                }
+            },
+            onScanSuccess
+        );
+
+        scannerRunning = true;
+
+    } catch(err){
+
+        console.error(err);
+
+        errorBox.classList.remove("hidden");
+
+        errorBox.innerHTML = `
+            <strong>Camera Access Error:</strong><br>
+            Unable to access the camera. Please allow permissions and try again.
+        `;
+
+        setStatus(
+            "Camera Denied",
+            "bg-red-500/20 border border-red-400/30 text-red-300"
+        );
+    }
+}
+
+/* =========================================================
+   Stop Scanner
+========================================================= */
+
+async function stopScanner(){
+
+    if(!scannerRunning || !html5QrCode) return;
+
+    try{
+        await html5QrCode.stop();
+        await html5QrCode.clear();
+
+        scannerRunning = false;
+
+        setStatus(
+            "Stopped",
+            "bg-slate-500/20 border border-slate-400/30 text-slate-300"
+        );
+
+    } catch(err){
+        console.error(err);
+    }
+}
+
+/* =========================================================
+   Switch Camera
+========================================================= */
+
+async function switchCamera(){
+
+    currentCamera =
+        currentCamera === "environment"
+        ? "user"
+        : "environment";
+
+    if(scannerRunning){
+
+        await stopScanner();
+
+        setTimeout(() => {
+            startScanner();
+        }, 400);
+    }
+}
+
+/* =========================================================
+   Flashlight Toggle
+========================================================= */
+
+async function toggleFlash(){
+
+    try{
+
+        if(html5QrCode){
+
+            const track =
+                html5QrCode.getRunningTrackSettings
+                ? html5QrCode.getRunningTrackSettings()
+                : null;
+
+            console.log(track);
+
+            // Flashlight support depends on browser/device
+            alert("Flashlight support depends on your mobile browser/device.");
+
+        }
+
+    } catch(err){
+        console.log(err);
+    }
+}
+
+/* =========================================================
+   Event Listeners
+========================================================= */
+
+document.getElementById("startBtn")
+    .addEventListener("click", startScanner);
+
+document.getElementById("stopBtn")
+    .addEventListener("click", stopScanner);
+
+
+/* =========================================================
+   Auto Start on Page Load
+========================================================= */
+
+window.addEventListener("load", () => {
+
+    // Auto start after slight delay
+    setTimeout(() => {
+        startScanner();
+    }, 1200);
+
+});
+</script>
+
+</body>
+</html>
